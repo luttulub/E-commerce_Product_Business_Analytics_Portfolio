@@ -1,6 +1,6 @@
 # Progress Log
 
-## 2026-07-27
+## 2026-07-27 — 분석 환경 구축 및 데이터 준비
 
 - PostgreSQL 및 DBeaver 분석 환경 구축
 - Olist CSV 데이터 9개 테이블 적재 완료
