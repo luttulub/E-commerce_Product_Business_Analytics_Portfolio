@@ -585,3 +585,108 @@ order by reverse_time_gap desc;
 - 고객 배송 완료일과 배송 예정일이 유효한 경우 배송 지연 분석에는 유지한다.
 */
 
+-- =========================================================
+-- 7. 테이블 간 연결 누락 검증
+-- =========================================================
+
+
+-- 7-1. 주문 관련 테이블 연결 검증
+-- 주문 및 주문 하위 테이블의 주요 참조 관계가 정상적으로 연결되는지 확인
+
+-- customers와 연결되지 않는 주문 확인
+select
+	count(*) unlinked_order_cnt
+from orders o
+	left join customers c
+		on o.customer_id = c.customer_id
+where c.customer_id is null;
+
+
+-- orders와 연결되지 않는 주문상품 행 확인
+select
+	count(*) unlinked_item_row_cnt
+from items i
+	left join orders o
+		on i.order_id = o.order_id
+where o.order_id is null;
+
+
+-- orders와 연결되지 않는 결제 행 확인
+select
+	count(*) unlinked_payment_row_cnt
+from payments p
+	left join orders o
+		on p.order_id = o.order_id
+where o.order_id is null;
+
+
+-- orders와 연결되지 않는 리뷰 행 확인
+select
+	count(*) unlinked_review_row_cnt
+from reviews r
+	left join orders o
+		on r.order_id = o.order_id
+where o.order_id is null;
+/*
+확인 결과:
+- customers와 연결되지 않는 주문은 0건이다.
+- orders와 연결되지 않는 items, payments, reviews 행도 모두 0건이다.
+- 주문을 중심으로 한 주요 테이블 간 연결 관계는 모두 정상적으로 유지되고 있다.
+*/
+
+
+-- 7-2. 주문상품 관련 기준정보 연결 검증
+-- items의 상품과 판매자 정보가 기준 테이블과 정상적으로 연결되는지 확인
+
+-- products와 연결되지 않는 주문상품 행 확인
+select
+	count(*) unlinked_product_item_cnt
+from items i
+	left join products p
+		on i.product_id = p.product_id
+where p.product_id is null;
+
+
+-- sellers와 연결되지 않는 주문상품 행 확인
+select
+	count(*) unlinked_seller_item_cnt
+from items i
+	left join sellers s
+		on i.seller_id = s.seller_id
+where s.seller_id is null;
+/*
+확인 결과:
+- products와 연결되지 않는 items 행은 0건이다.
+- sellers와 연결되지 않는 items 행도 0건이다.
+- 모든 주문상품이 상품 및 판매자 기준정보와 정상적으로 연결된다.
+*/
+
+
+-- 7-3. 상품 카테고리 정보 검증
+-- 카테고리 정보가 비어 있거나 번역 테이블과 연결되지 않는 상품을 확인
+
+-- 카테고리명이 비어 있는 상품 확인
+select
+	count(*) blank_category_product_cnt
+from products
+where nullif(trim(product_category_name), '') is null;
+
+
+-- 카테고리명은 존재하지만 category와 연결되지 않는 상품 확인
+select
+	p.product_category_name,
+	count(*) product_cnt
+from products p
+	left join category c
+		on p.product_category_name = c.product_category_name
+where nullif(trim(p.product_category_name), '') is not null
+	and c.product_category_name is null
+group by p.product_category_name
+order by product_cnt desc;
+/*
+확인 결과:
+- 카테고리명이 비어 있는 상품은 610개다.
+- 카테고리명은 존재하지만 번역 테이블과 연결되지 않는 카테고리는 2개이며, 총 13개 상품이다.
+- 미번역 카테고리는 portateis_cozinha_e_preparadores_de_alimentos 10개와 pc_gamer 3개다.
+- 빈 카테고리와 번역 누락 카테고리는 상품 카테고리 분석 시 별도 처리 기준을 적용한다.
+*/
