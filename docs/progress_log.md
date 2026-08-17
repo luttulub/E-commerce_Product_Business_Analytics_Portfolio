@@ -217,11 +217,19 @@
 
 검증 결과를 바탕으로 원본 데이터를 일괄 삭제하거나 수정하지 않고, 각 지표에 필요한 컬럼의 유효성을 기준으로 선택적으로 데이터를 사용할 예정이다.
 
-### 다음 단계
 
-`02_order_level_mart.sql`
 
-* 주문 1건 = 1행 구조 설계
-* `items`, `payments`, `reviews`를 `order_id` 기준으로 사전 집계
-* 집계 결과를 `orders`와 결합
-* 주문 금액, 상품 수, 배송비, 결제금액, 리뷰점수, 배송 소요시간 등 주문 단위 분석 컬럼 생성
+### 02_order_level_mart.sql 완료
+
+* 주문 1건 = 1행을 Grain으로 하는 `order_level_mart` View 생성
+* `orders + customers`를 기반으로 고객 고유 ID 연결
+* `payments`, `items`, `reviews`를 `order_id` 기준으로 선집계한 뒤 JOIN하여 중복 집계 방지
+* 주문별 `payment_total`, `item_count` 생성
+* 배송 예정일과 실제 배송일을 이용해 `delivery_delay_days`, `delayed_flag` 생성
+* 다중 리뷰 구조를 검증한 뒤 주문별 평균 `review_score` 적용
+* 리뷰 작성 여부를 `reviewed_flag`로 생성
+* 결제·상품·배송·리뷰 정보가 없는 주문은 삭제하지 않고 분석 목적에 맞게 null 또는 flag로 유지
+* 최종 검증 결과 전체 99,441행과 distinct order_id 99,441건이 일치하여 주문 1건 = 1행 구조 확인
+
+**다음 작업:** `03_customer_behavior_mart.sql` 생성
+
