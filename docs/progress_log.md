@@ -251,3 +251,23 @@
 * 최종 검증 결과 전체 고객 수와 distinct customer_unique_id가 모두 **93,358명**으로 일치
 
 **다음 작업:** `04_order_lifecycle_analysis.sql`
+
+### 04_order_lifecycle_analysis.sql 완료
+
+- 전체 주문 99,441건을 기준으로 Created → Approved → Delivered 주문 Lifecycle 정의
+- 결제 승인 주문 99,281건, 실제 배송 완료 주문 96,470건 확인
+- 주문 상태별 분포 분석 및 미완료 주문 상태 확인
+- Lifecycle 전환율 계산
+  - Created → Approved: **99.84%**
+  - Approved → Delivered: **97.15%**
+  - Created → Delivered: **97.01%**
+- 결제 승인 시점 미확인 주문 160건 분석
+  - canceled 141건 / delivered 14건 / created 5건
+- 승인 후 미배송 주문 2,825건 분석
+  - shipped 1,107건(39.2%)으로 가장 높은 비중
+- 실제 배송 완료 주문 96,470건 중 지연 주문 6,534건 확인
+  - 배송 지연율 **6.77%**
+  - 지연 발생 시 평균 **10.62일**
+- 승인 시점 결측 14건, 배송일 결측 8건, canceled 상태의 지연 주문 1건 등 데이터 품질 예외 확인
+
+**다음 작업:** `05_cohort_retention.sql`
