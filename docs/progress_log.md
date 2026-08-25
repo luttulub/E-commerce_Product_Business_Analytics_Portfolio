@@ -233,3 +233,21 @@
 
 **다음 작업:** `03_customer_behavior_mart.sql` 생성
 
+
+
+## 2026-08-25
+
+### 03_customer_behavior_mart.sql 완료
+
+* `order_level_mart`의 delivered 주문을 기준으로 고객 1명 = 1행인 `customer_behavior_mart` View 생성
+* 고객별 구매 순서를 생성해 첫/두 번째/마지막 구매와 주문 횟수 집계
+* `total_payment`, `average_order_value`, `first_order_payment_total` 생성
+* 첫 주문 리뷰 점수와 배송 지연 여부를 첫 구매 경험 변수로 구성
+* `days_to_second_order`, `purchase_span_days` 생성
+* delivered 주문 종료일 `2018-08-29`를 기준으로 `eligible_30d/60d/90d` 생성
+* 관찰 가능 고객만 기준으로 30/60/90일 재구매 여부 계산
+* 재구매율: **30일 1.59% / 60일 1.96% / 90일 2.28%**
+* 첫 구매월 기준 `cohort_month` 생성
+* 최종 검증 결과 전체 고객 수와 distinct customer_unique_id가 모두 **93,358명**으로 일치
+
+**다음 작업:** `04_order_lifecycle_analysis.sql`
