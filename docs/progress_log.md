@@ -330,3 +330,48 @@
 - 관측 데이터이므로 각 driver와 재구매 사이의 인과관계는 단정하지 않음
 
 **다음 작업:** `07_business_action_targets.sql`
+
+
+
+## 2026-08-29
+
+### 06_repurchase_driver_analysis.sql 보강 및 최종 검증
+
+- 기존 재구매 driver 분석의 시간 순서와 누락 변수를 재검토
+- 90일 재구매 고객 1,716명 중 963명(56.12%)이 첫 주문 배송 완료 전에 이미 두 번째 주문을 한 것을 확인
+- 배송 경험의 시간적 선후관계를 보정하기 위해 첫 배송 완료 이후 90일 재구매율을 추가 검증
+  - 정상 배송: 1.16%
+  - 배송 지연: 0.79%
+  - 차이: -0.37%p
+- 리뷰 점수의 역할을 재구매 driver에서 고객 경험(CX) 결과지표로 재정의
+  - 정상 배송 평균 리뷰: 4.29
+  - 배송 지연 평균 리뷰: 2.27
+  - 정상 배송 저리뷰율: 9.28%
+  - 배송 지연 저리뷰율: 62.54%
+- 배송 지연 강도별 리뷰 경험 추가 분석
+  - 3일 이하 지연 평균 리뷰 3.29 / 저리뷰율 32.08%
+  - 4~7일 2.09 / 68.08%
+  - 8~13일 1.69 / 79.79%
+  - 14일 이상 1.70 / 79.00%
+- 첫 주문 카테고리 구조 검증
+  - 단일 카테고리 91,320명(97.82%)
+  - multi_category 671명(0.72%)
+  - unknown_category 1,367명(1.46%)
+- 대표 카테고리를 임의 선정하지 않고 단일 카테고리는 실제 영어 카테고리명, 복수 카테고리는 multi_category로 분류
+- 90일 관찰 가능 고객 1,000명 이상인 주요 실제 카테고리 19개의 재구매율 비교
+  - fashion_bags_accessories 4.49%
+  - bed_bath_table 3.91%
+  - furniture_decor 3.40%
+  - cool_stuff 0.93%
+  - electronics 1.08%
+- 첫 주문금액과 카테고리의 관계 추가 검증
+  - Q1~Q4 각 구간 최소 100명 이상인 주요 카테고리 18개 중 13개에서 Q4 재구매율이 Q1보다 낮음
+  - 일부 카테고리에서는 반대 또는 비선형 패턴 확인
+- 첫 주문금액을 독립적인 영향 요인이 아닌 targeting signal로 해석하도록 최종 결론 보완
+- 최종 변수 역할 정리
+  - first_order_payment: targeting signal
+  - delivery_delay: operational experience
+  - review_score: CX metric
+  - first_order_category: product context
+
+**다음 작업:** `07_business_action_targets.sql`
