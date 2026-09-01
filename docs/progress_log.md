@@ -422,3 +422,35 @@
 - `customer_behavior_mart`, `order_level_mart`를 기반으로 재구매 driver validation을 진행할 분석 기반 구성
 
 **다음 작업:** 첫 주문 카테고리를 결합한 validation dataset 구성 → SQL 재구매 분석 결과 재현 → 후보 요인 통계적·다변량 검증 → `07_business_action_targets.sql` 최종 타깃 및 액션 설계
+
+
+
+## 2026-09-02
+
+### 01_repurchase_driver_validation.ipynb Retention 및 CX 검증
+
+- 90일 관찰 가능 고객 75,386명, 재구매 고객 1,716명을 기준으로 Retention 로지스틱 회귀 수행
+- 첫 주문금액, 첫 주문 카테고리, 첫 구매 cohort를 동시에 고려해 재구매와의 관계 검증
+- 변수 단위 Wald test 결과
+  - payment_group: p=0.0088
+  - category_model: p<0.001
+  - cohort_quarter: p<0.001
+- q1을 기준으로 첫 주문금액 구간별 재구매 odds 비교
+  - q2: OR 0.8851 / p=0.0752로 유의한 차이 없음
+  - q3: OR 0.8156 / p=0.0041로 q1 대비 재구매 odds 약 18.4% 낮음
+  - q4: OR 0.8084 / p=0.0032로 q1 대비 재구매 odds 약 19.2% 낮음
+- 카테고리와 구매 시점을 함께 고려한 이후에도 q3·q4의 낮은 재구매 odds가 유지돼 첫 주문금액을 Retention targeting signal로 유지
+- 배송 지연 고객을 대상으로 저리뷰 여부를 종속변수로 한 CX 로지스틱 회귀 수행
+- CX 변수 단위 Wald test 결과
+  - delay_group: p<0.001
+  - cohort_quarter: p<0.001
+  - payment_group: 유의하지 않음
+  - category_model: 유의하지 않음
+- 4일 이상 배송 지연 고객의 저리뷰 odds는 1~3일 지연 대비 약 6.1배 높게 나타남
+  - OR 6.0907
+  - 95% CI 5.3909~6.8813
+  - p<0.001
+- 배송 지연 기간별 저리뷰율은 1~3일 32.08%에서 4~7일 68.08%로 급증하고, 8일 이상에서는 약 79~80% 수준 유지
+- 4일 이상 배송 지연을 CX 개선 대상 선정 기준으로 활용하기로 정리
+
+**다음 작업:** `07_business_action_targets.sql`로 복귀해 Retention 타깃, CX 액션, KPI 및 최종 Action Board 설계
