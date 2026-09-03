@@ -458,7 +458,9 @@
 
 
 ## 2026-09-03
+
 ### 07_business_action_targets.sql 최종 액션 타깃 설계
+
 - Python 통계 검증 결과를 반영해 기존 payment × delivery 중심 후보 탐색 구조를 최종 액션 타깃 중심으로 재구성
 - 고객 1명 = 1행의 `action_target_base`를 구성하고 retention, cx 분석에 필요한 payment, category, cohort, delivery, review 변수를 통합
   - 전체 고객 93,358명
@@ -484,3 +486,33 @@
 - 관찰데이터 분석 결과를 액션 대상과 baseline 정의까지 연결하고, 실제 액션 효과는 후속 A/B test에서 검증하도록 분석 범위를 구분
 
 **다음 작업:** Olist 분석 결과를 기반으로 `ab_test_design.md` 작성 및 실험 설계
+
+### 02_ab_test_design.ipynb A/B test 설계 및 power analysis
+
+- `07_business_action_targets.sql`에서 정의한 retention, cx target과 baseline을 기반으로 후속 A/B test 설계
+- 공통 실험 조건 설정
+  - treatment / control 1:1 무작위 배정
+  - 유의수준 0.05, 검정력 0.80
+  - treatment / control의 표본 비율과 category, cohort 분포를 확인해 randomization 점검
+- retention experiment 설계
+  - target: 첫 주문금액 q3, q4 고객
+  - treatment: 첫 구매 category 기반 재구매 유도 푸시
+  - control: 추가 재구매 유도 메시지 없이 기존 구매 경험 유지
+  - primary KPI: 90d repurchase rate
+  - baseline: 2.12%
+  - historical target 46,878명을 모두 90일 관찰한다고 가정할 경우 약 +0.39%p 이상의 차이를 80% 검정력으로 검출 가능
+  - relative lift 기준 약 +18.3%
+- cx experiment 설계
+  - target: 예상 배송일 기준 4일 이상 지연 고객
+  - treatment: 선제 배송 안내 + 보상 쿠폰을 포함한 service recovery
+  - control: 기존 배송 지연 대응 유지
+  - primary KPI: low review rate
+  - secondary KPI: avg review score, review submission rate
+  - baseline: 75.02%
+  - 리뷰 확인 가능 historical sample 4,404명 기준 약 -3.74%p 이상의 차이를 80% 검정력으로 검출 가능
+  - relative reduction 기준 약 5.0%
+- 각 실험의 hypothesis, observation period, decision rule을 정의하고 통계적 유의성과 실제 비즈니스 적용 판단을 구분
+- detectable effect는 현재 historical sample 규모에서 역산한 값이며 비즈니스 성공 기준인 MDE와 구분
+- Olist에는 실제 treatment / control 배정 정보가 없어 실험 결과 분석은 수행하지 않고, 실제 운영에서는 MDE와 sample size를 사전 정의한 무작위 실험으로 효과를 검증하도록 한계 명시
+
+**다음 작업:** Tableau 대시보드 구성 및 핵심 분석 결과 시각화
