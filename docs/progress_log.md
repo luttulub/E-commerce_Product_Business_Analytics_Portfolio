@@ -454,3 +454,33 @@
 - 4일 이상 배송 지연을 CX 개선 대상 선정 기준으로 활용하기로 정리
 
 **다음 작업:** `07_business_action_targets.sql`로 복귀해 Retention 타깃, CX 액션, KPI 및 최종 Action Board 설계
+
+
+
+## 2026-09-03
+### 07_business_action_targets.sql 최종 액션 타깃 설계
+- Python 통계 검증 결과를 반영해 기존 payment × delivery 중심 후보 탐색 구조를 최종 액션 타깃 중심으로 재구성
+- 고객 1명 = 1행의 `action_target_base`를 구성하고 retention, cx 분석에 필요한 payment, category, cohort, delivery, review 변수를 통합
+  - 전체 고객 93,358명
+  - 90일 관찰 가능 고객 75,387명
+  - 90일 재구매 고객 1,716명
+- retention target pool을 첫 주문금액 q3, q4 고객으로 선정
+  - 전체 46,878명, 전체 고객의 50.21%
+  - 90일 관찰 가능 고객 37,691명
+  - baseline 90일 재구매율 2.12%
+  - Python 회귀에서 category, cohort를 고려한 뒤에도 q3, q4의 낮은 재구매 odds가 유의하게 유지된 결과를 반영
+- q3, q4 고객의 category별 90일 재구매율이 0.55~4.20%로 큰 차이를 보여 category를 단독 타깃보다 우선순위 및 CRM 개인화 context로 활용
+- 배송 지연 강도별 CX를 재확인해 4일 이상 지연을 cx intervention 기준으로 선정
+  - 4일 이상 지연 고객 4,534명, 전체 고객의 4.86%
+  - 평균 리뷰 1.85점, 저리뷰율 75.02%
+  - Python 회귀에서 payment, category, cohort를 고려한 뒤에도 1~3일 지연 대비 저리뷰 odds 약 6.1배 확인
+- cohort별 성과 차이를 확인
+  - q3, q4의 90일 재구매율은 주요 cohort별 1.58~2.54%
+  - 4일 이상 지연 고객의 저리뷰율은 주요 cohort별 약 65~80%
+  - cohort는 직접적인 타깃보다 실험 및 성과 평가에서 시기 차이를 고려하는 context 변수로 활용
+- retention, cx 각각의 target 규모와 baseline KPI를 확정하고 final action board 구성
+  - retention: q3, q4 → category 기반 second-purchase CRM experiment → 90d repurchase rate
+  - cx: 4일 이상 지연 → proactive delay communication / service recovery experiment → low review rate
+- 관찰데이터 분석 결과를 액션 대상과 baseline 정의까지 연결하고, 실제 액션 효과는 후속 A/B test에서 검증하도록 분석 범위를 구분
+
+**다음 작업:** Olist 분석 결과를 기반으로 `ab_test_design.md` 작성 및 실험 설계
